@@ -1,0 +1,85 @@
+@*
+* Copyright 2017 Interel
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+* New Local User Modal Template
+*@
+
+@(id: String, permissions: Seq[String])
+<div id="@id" uk-modal="bg-close: false">
+    <div class="uk-modal-dialog">
+        <button class="uk-modal-close-default" type="button" uk-close></button>
+        <div class="uk-modal-header">
+            <h2 class="uk-modal-title">New User</h2>
+        </div>
+        <div class="uk-modal-body" uk-overflow-auto>
+            <form class="uk-form-stacked uk-margin-small" id="c3eu-user-add-form">
+                <div class="uk-margin">
+                    <label class="uk-form-label" for="c3eu-user-first-name">First Name</label>
+                    <div class="uk-form-controls">
+                        <input class="uk-input" id="c3eu-user-first-name" name="firstName" type="text">
+                    </div>
+                </div>
+                <div class="uk-margin">
+                    <label class="uk-form-label" for="c3eu-user-last-name">Last Name</label>
+                    <div class="uk-form-controls">
+                        <input class="uk-input" id="c3eu-user-last-name" name="lastName" type="text">
+                    </div>
+                </div>
+                <div class="uk-margin">
+                    <label class="uk-form-label" for="c3eu-user-id">User ID</label>
+                    <div class="uk-form-controls">
+                        <input class="uk-input" id="c3eu-user-id" name="userID" type="text">
+                    </div>
+                </div>
+                <div class="uk-margin">
+                    <label class="uk-form-label" for="c3eu-user-password">Password</label>
+                    <div class="uk-form-controls">
+                        <input class="uk-input" id="c3eu-user-password" name="rawPassword" type="password">
+                    </div>
+                </div>
+                <div class="uk-margin">
+                    <label class="uk-form-label" for="c3eu-user-password-confirm">Confirm Password</label>
+                    <div class="uk-form-controls">
+                        <input class="uk-input" id="c3eu-user-password-confirm" name="rawPasswordConfirm" type="password">
+                    </div>
+                </div>
+                <div class="uk-margin">
+                    <label class="uk-form-label" for="c3eu-user-permissions">User Type</label>
+                    <div class="uk-form-controls">
+                        <select class="uk-select" id="c3eu-user-permissions" name="permissions" multiple>
+                            @for(current <- permissions) {
+                            <option value="@current">@{current.split("core3.workflows.definitions.").last}</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="uk-margin">
+                    <label class="uk-form-label" for="c3eu-user-type">User Type</label>
+                    <div class="uk-form-controls">
+                        <select class="uk-select" id="c3eu-user-type" name="userType">
+                            <option value="" selected disabled></option>
+                            <option value="Client">Client</option>
+                            <option value="Service">Service</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="uk-modal-footer uk-text-right">
+            <button class="uk-button uk-button-default uk-modal-close c3eu-user-add-cancel" type="button">Cancel</button>
+            <button class="uk-button uk-button-primary uk-modal-close c3eu-user-add-create" type="button">Create</button>
+        </div>
+    </div>
+</div>

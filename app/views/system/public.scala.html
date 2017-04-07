@@ -1,0 +1,74 @@
+@*
+* Copyright 2017 Interel
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+* Example Public Page - Renders different information, depending on whether the user has logged in or not.
+*@
+
+@import views.html.components.pageHead
+@import views.html.components.pageNav
+@import views.html.components.pageFooter
+@import views.html.components.pageJs
+@import containers.UserData
+
+@(title: String, user: Option[UserData])(implicit environment: play.api.Environment, request: play.api.mvc.RequestHeader)
+
+<!DOCTYPE html>
+<html>
+@pageHead(title)
+<body>
+<div class="uk-container uk-container-large uk-margin-medium-bottom">
+    @pageNav(title, user)
+    <div class="uk-flex-center uk-grid-small uk-grid-match" uk-grid>
+        <div class="uk-width-1-1">
+            <div class="uk-flex-center uk-grid-small" uk-grid>
+                <div class="uk-placeholder">Example public page for all users.</div>
+            </div>
+        </div>
+        @user match {
+            case Some(data) => {
+            <div class="uk-width-1-2">
+                <div class="uk-card uk-card-small uk-card-default uk-card-body">
+                    <h3 class="uk-card-title uk-text-center">Name</h3>
+                    <p class="uk-text-center uk-text-danger">@data.name</p>
+                </div>
+            </div>
+            <div class="uk-width-1-2">
+                <div class="uk-card uk-card-small uk-card-default uk-card-body uk-text-justify">
+                    <h3 class="uk-card-title uk-text-center">Permissions</h3>
+                    @for(p <- data.permissions) {
+                        @if(p.contains("core3.workflows.definitions")) {
+                        <span class="uk-label uk-label-default">@p.split("core3.workflows.definitions.").last.split("System").last</span>
+                        } else {
+                        <span class="uk-label uk-label-warning">@p</span>
+                        }
+                    }
+                </div>
+            </div>
+            }
+
+            case None => {
+            <div>
+                <div class="uk-placeholder">
+                    You need to <a class='uk-text-warning' href='/system/login'>log in</a> before you can continue
+                </div>
+            </div>
+            }
+        }
+    </div>
+    @pageFooter()
+</div>
+</body>
+@pageJs()
+</html>

@@ -1,0 +1,81 @@
+@*
+* Copyright 2017 Interel
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+* User Container
+*@
+
+@import containers.UserData
+@import core3.database.containers.core.{LocalUser, UserType}
+@import core3.utils._
+@import core3.utils.Time._
+
+@(user: LocalUser, caller: UserData, permissions: Seq[String], isNew: Boolean = false)
+<div class="uk-width-1-3">
+    <div class="uk-card uk-card-default c3eu-user-container @if(isNew) {c3eu-new-highlight}">
+        <div class="uk-card-header">
+            <div class="uk-grid-small uk-flex-left" uk-grid>
+                <div class="uk-width-expand">
+                    <h3 class="uk-card-title uk-margin-remove-bottom c3eu-user-id">@{user.userID}</h3>
+                </div>
+                <div class="uk-width-auto c3eu-user-button-container">
+                    @if(caller.permissions.contains("c3eu:edit")) {
+                    <a title="Reset Password" class="uk-icon-button uk-text-success c3eu-user-reset-password" uk-icon="icon: more" uk-tooltip href='@{s"#c3eu-user-modal-reset-password-${user.id}"}' uk-toggle></a>
+                    <a title="Edit" class="uk-icon-button uk-text-warning c3eu-user-edit" uk-icon="icon: pencil" uk-tooltip></a>
+                    }
+                    @if(caller.permissions.contains("c3eu:delete")) {
+                    <a title="Delete" class="uk-icon-button uk-text-danger c3eu-user-delete" uk-icon="icon: trash" uk-tooltip></a>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="uk-card-body">
+            <dl class="uk-description-list">
+                <dt>
+                    @user.userType match {
+                        case UserType.Client => {Client}
+                        case UserType.Service => {Service}
+                    }
+                </dt>
+                <dd>
+                    <span class="c3eu-user-first-name">@{(user.metadata \ "first_name").as[String]}</span>
+                    <span class="c3eu-user-last-name">@{(user.metadata \ "last_name").as[String]}</span>
+                    <select class="uk-select" id="c3eu-user-permissions" name="permissions" multiple disabled>
+                        @for(current <- permissions) {
+                        <option value="@current" @if(user.permissions.contains(current)) {selected}>@{current.split("core3.workflows.definitions.").last}</option>
+                        }
+                    </select>
+                </dd>
+            </dl>
+        </div>
+        <div class="uk-card-footer">
+            <div class="uk-text-right">
+                <div class="uk-text-meta">
+                    Created: <strong>@{user.created.toFormattedString(TimestampFormat.Html5Timestamp)}</strong>
+                </div>
+                <div class="uk-text-meta">
+                    Updated: <strong>@{user.updated.toFormattedString(TimestampFormat.Html5Timestamp)}</strong>
+                </div>
+                <div class="uk-hidden c3eu-user-object-data"
+                     data-id="@{user.id}"
+                     data-revision="@{user.revision}"
+                     data-revisionNumber="@{user.revisionNumber}">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        @_reset_password_modal(s"c3eu-user-modal-reset-password-${user.id}", user)
+    </div>
+</div>

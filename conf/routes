@@ -1,0 +1,31 @@
+# Routes
+
+### Public ###
+GET     /favicon.ico                            controllers.Assets.at(path="/public/img", file="favicon.png")
+GET     /public/*file                           controllers.Assets.versioned(path="/public", file: Asset)
+
+### System ###
+GET     /                                       controllers.System.root
+GET     /public                                 controllers.System.public
+GET     /internal                               controllers.System.internal
+GET     /system/status                          controllers.System.status
+GET     /system/login                           controllers.System.loginPage
+POST    /system/login                           controllers.System.login
+GET     /system/logout                          controllers.System.logout
+
+### Transaction Logs ###
+GET     /logs                                   controllers.Logs.page
+
+### Groups ###
+GET     /groups                                 controllers.Groups.page
+POST    /groups/create                          controllers.Groups.create
+POST    /groups/delete                          controllers.Groups.delete
+POST    /groups/update                          controllers.Groups.update
+
+### Users ###
+GET     /users                                  controllers.Users.page
+POST    /users/create                           controllers.Users.create
+POST    /users/delete                           controllers.Users.delete
+POST    /users/update-password                  controllers.Users.updatePassword
+POST    /users/update-permissions               controllers.Users.updatePermissions
+POST    /users/update-metadata                  controllers.Users.updateMetadata

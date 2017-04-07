@@ -1,0 +1,57 @@
+@*
+* Copyright 2017 Interel
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+* New Group Modal Template
+*@
+
+@(id: String)
+<div id="@id" uk-modal="bg-close: false">
+    <div class="uk-modal-dialog">
+        <button class="uk-modal-close-default" type="button" uk-close></button>
+        <div class="uk-modal-header">
+            <h2 class="uk-modal-title">New Group</h2>
+        </div>
+        <div class="uk-modal-body" uk-overflow-auto>
+            <form class="uk-form-stacked uk-margin-small" id="c3eu-group-add-form">
+                <div class="uk-margin">
+                    <label class="uk-form-label" for="c3eu-group-name">Name</label>
+                    <div class="uk-form-controls">
+                        <input class="uk-input" id="c3eu-group-name" name="name" type="text">
+                    </div>
+                </div>
+                <div class="uk-margin">
+                    <label class="uk-form-label" for="c3eu-group-short-name">Short Name</label>
+                    <div class="uk-form-controls">
+                        <input class="uk-input" id="c3eu-group-short-name" name="shortName" type="text">
+                    </div>
+                </div>
+                <div class="uk-margin">
+                    <label class="uk-form-label" for="c3eu-group-items-type">Items Type</label>
+                    <div class="uk-form-controls">
+                        <select class="uk-select" id="c3eu-group-items-type" name="itemsType">
+                            <option value="" selected disabled></option>
+                            <option value="TransactionLog">Transaction Log</option>
+                            <option value="LocalUser">Local User</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="uk-modal-footer uk-text-right">
+            <button class="uk-button uk-button-default uk-modal-close c3eu-group-add-cancel" type="button">Cancel</button>
+            <button class="uk-button uk-button-primary uk-modal-close c3eu-group-add-create" type="button">Create</button>
+        </div>
+    </div>
+</div>
