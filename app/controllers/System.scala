@@ -94,5 +94,5 @@ class System @Inject()(engineConnection: WorkflowEngineConnection, cache: CacheA
   )
 
   //Logout action handler
-  def logout() = LogoutAction("/")
+  def logout() = LogoutAction()
 }
