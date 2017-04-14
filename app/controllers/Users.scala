@@ -36,6 +36,7 @@ import play.api.data.Forms._
 import play.api.data._
 import play.api.data.format.Formatter
 import play.api.libs.json.{JsArray, JsValue, Json}
+import play.filters.csrf.CSRF
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -48,7 +49,10 @@ class Users @Inject()(engineConnection: WorkflowEngineConnection, cache: CacheAp
 
   def page() = AuthorizedAction(
     "c3eu:view",
-    okHandler = { (request, user) => implicit val r = request
+    okHandler = { (request, user) =>
+      implicit val r = request
+      implicit val token = CSRF.getToken
+
       val userData = UserData(user)
       for {
         result <- engineConnection.post(

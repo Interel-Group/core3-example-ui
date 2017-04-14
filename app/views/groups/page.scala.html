@@ -22,13 +22,20 @@
 @import views.html.components.pageJs
 @import containers.UserData
 @import core3.database.containers.core.Group
+@import play.filters.csrf.CSRF
+@import play.api.mvc.RequestHeader
 
-@(title: String, user: UserData, groups: Seq[Group])(implicit environment: play.api.Environment, request: play.api.mvc.RequestHeader)
+@(title: String, user: UserData, groups: Seq[Group])(implicit environment: play.api.Environment, request: RequestHeader, csrfToken: Option[CSRF.Token])
 
 <!DOCTYPE html>
 <html>
 @pageHead(title)
 <body>
+
+@for(token <- csrfToken) {
+    <div id="csrfToken" data-token-name="@{token.name}" data-token-value="@{token.value}"></div>
+}
+
 <div class="uk-container uk-container-large uk-margin-medium-bottom">
     @pageNav(title, Some(user))
     <div class="uk-text-center uk-margin-small-bottom uk-card uk-card-default uk-card-body uk-padding-small" uk-sticky="offset: 30;">
@@ -46,7 +53,7 @@
     </div>
     <div id="c3eu-group-grid" class="uk-flex uk-grid-small" uk-grid uk-height-match="target: .uk-card-body">
         @for(current <- groups) {
-        @_group(current, user)
+            @_group(current, user)
         }
     </div>
     @pageFooter()

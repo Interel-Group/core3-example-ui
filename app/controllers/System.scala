@@ -26,6 +26,7 @@ import core3.http.responses.GenericResult
 import play.api.Environment
 import play.api.cache.CacheApi
 import play.api.libs.json.Json
+import play.filters.csrf.CSRF
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -74,7 +75,10 @@ class System @Inject()(engineConnection: WorkflowEngineConnection, cache: CacheA
 
   //Login page handler that redirects to "/", if the user has already logged in.
   def loginPage = PublicAction(
-    { (request, user) => implicit val r = request
+    { (request, user) =>
+      implicit val r = request
+      implicit val token = CSRF.getToken
+
       user match {
         case Some(_) => Future.successful(Redirect("/"))
         case None => Future.successful(Ok(views.html.system.login("Login")))

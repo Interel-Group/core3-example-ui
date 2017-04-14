@@ -22,13 +22,20 @@
 @import views.html.components.pageJs
 @import containers.UserData
 @import core3.database.containers.core.LocalUser
+@import play.filters.csrf.CSRF
+@import play.api.mvc.RequestHeader
 
-@(title: String, user: UserData, users: Seq[LocalUser], permissions: Seq[String])(implicit environment: play.api.Environment, request: play.api.mvc.RequestHeader)
+@(title: String, user: UserData, users: Seq[LocalUser], permissions: Seq[String])(implicit environment: play.api.Environment, request: RequestHeader, csrfToken: Option[CSRF.Token])
 
 <!DOCTYPE html>
 <html>
 @pageHead(title)
 <body>
+
+@for(token <- csrfToken) {
+    <div id="csrfToken" data-token-name="@{token.name}" data-token-value="@{token.value}"></div>
+}
+
 <div class="uk-container uk-container-large uk-margin-medium-bottom">
     @pageNav(title, Some(user))
     <div class="uk-text-center uk-margin-small-bottom uk-card uk-card-default uk-card-body uk-padding-small" uk-sticky="offset: 30;">

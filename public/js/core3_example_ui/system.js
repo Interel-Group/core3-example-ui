@@ -53,11 +53,14 @@ define([],
                     errorContainer.addClass("uk-hidden");
                     errorContainer.html("");
 
+                    var csrfToken = $("#csrfToken").attr("data-token-value");
+
                     $.ajax({
                         type: "POST",
                         url: "/system/login",
                         beforeSend: function (xhr) {
                             xhr.setRequestHeader ("Authorization", "Basic " + btoa(userControl.val() + ":" + passwordControl.val()));
+                            xhr.setRequestHeader ("Csrf-Token", csrfToken);
                         }
                     }).done(function (result) {
                         if(result.wasSuccessful) {

@@ -20,13 +20,20 @@
 @import views.html.components.pageNav
 @import views.html.components.pageFooter
 @import views.html.components.pageJs
+@import play.filters.csrf.CSRF
+@import play.api.mvc.RequestHeader
 
-@(title: String)(implicit environment: play.api.Environment, request: play.api.mvc.RequestHeader)
+@(title: String)(implicit environment: play.api.Environment, request: RequestHeader, csrfToken: Option[CSRF.Token])
 
 <!DOCTYPE html>
 <html>
 @pageHead(title)
 <body>
+
+@for(token <- csrfToken) {
+<div id="csrfToken" data-token-name="@{token.name}" data-token-value="@{token.value}"></div>
+}
+
 <div class="uk-container uk-container-large uk-margin-medium-bottom">
     @pageNav(title, user = None)
     <div class="uk-flex-center uk-grid-small" uk-grid>

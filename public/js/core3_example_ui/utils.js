@@ -19,12 +19,18 @@ define([],
         }
 
         //Redirects the user to the login page, if their session has expired
-        Utils.ajax = function (type, url, data) {
+        Utils.ajax = function (type, url, data, csrfToken) {
             return $.get("/system/status").then(
                 function (result) {
+                    var headers = {};
+                    if(csrfToken) {
+                        headers["Csrf-Token"] = csrfToken
+                    }
+
                     return $.ajax({
                         type: type,
                         url: url,
+                        headers: headers,
                         data: data,
                         dataType: "json"
                     });
@@ -44,7 +50,8 @@ define([],
         };
 
         Utils.prototype.post = function (url, data) {
-            return Utils.ajax("POST", url, data);
+            var csrfToken = $("#csrfToken").attr("data-token-value");
+            return Utils.ajax("POST", url, data, csrfToken);
         };
 
         return new Utils();
