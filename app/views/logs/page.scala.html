@@ -1,0 +1,66 @@
+@*
+* Copyright 2017 Interel
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+* Transaction Logs Page
+*@
+
+@import views.html.components.pageHead
+@import views.html.components.pageNav
+@import views.html.components.pageFooter
+@import views.html.components.pageJs
+@import containers.UserData
+@import core3.database.containers.core.TransactionLog
+@import play.api.mvc.RequestHeader
+@import core3.utils._
+@import core3.utils.Time._
+
+@(title: String, user: UserData, logs: Seq[TransactionLog])(implicit environment: play.api.Environment, request: RequestHeader)
+
+<!DOCTYPE html>
+<html>
+@pageHead(title)
+<body>
+
+<div class="uk-container uk-container-large uk-margin-medium-bottom">
+    @pageNav(title, Some(user))
+    <div class="uk-text-center uk-margin-small-bottom uk-card uk-card-default uk-card-body uk-padding-small" uk-sticky="offset: 30;">
+        <div class="uk-inline">
+            <a href="#top" title="Scroll to Top" class="uk-button uk-button-default uk-button-small" uk-tooltip>
+                <span uk-icon="icon: arrow-up"></span>
+            </a>
+        </div>
+    </div>
+    <table class="uk-table uk-table-small uk-table-hover uk-table-striped">
+        <thead>
+        <tr><th>Timestamp</th><th>State</th><th>Workflow</th><th>User</th><th>Request ID</th><th>Type</th></tr>
+        </thead>
+        <tbody>
+        @for(current <- logs) {
+        <tr>
+            <td>@{current.timestamp.toFormattedString(TimestampFormat.Html5Timestamp)}</td>
+            <td>@{current.workflowState}</td>
+            <td>@{current.workflowName}</td>
+            <td>@{current.initiatingUser}</td>
+            <td>@{current.requestID}</td>
+            <td>@if(current.readOnlyWorkflow){ <span class="uk-label uk-label-info">R/O</span> } else { <span class="uk-label uk-label-warning">R/W</span> }</td>
+        </tr>
+        }
+        </tbody>
+    </table>
+    @pageFooter()
+</div>
+</body>
+@pageJs()
+</html>
