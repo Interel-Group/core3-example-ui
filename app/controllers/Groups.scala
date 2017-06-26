@@ -20,7 +20,6 @@ import javax.inject.Inject
 import containers.UserData
 import core3.config.StaticConfig
 import core3.database.ObjectID
-import core3.database.containers.JSONConverter
 import core3.database.containers.core
 import core3.database.dals.DatabaseAbstractionLayer
 import core3.http.controllers.local.ClientController
@@ -32,7 +31,7 @@ import play.api.Environment
 import play.api.cache.CacheApi
 import play.api.data.Forms._
 import play.api.data._
-import play.api.libs.json.{JsArray, JsValue, Json}
+import play.api.libs.json.Json
 import play.filters.csrf.CSRF
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -61,10 +60,7 @@ class Groups @Inject()(engineConnection: WorkflowEngineConnection, cache: CacheA
         if (result.wasSuccessful) {
           val groups = result.data.map {
             output =>
-              (output \ "groups").as[JsArray].value.map {
-                current =>
-                  JSONConverter.fromJsonData("Group", current).asInstanceOf[core.Group]
-              }
+              (output \ "groups").as[Vector[core.Group]]
           }.getOrElse(Seq.empty).sortWith(
             (a, b) =>
               a.created.isAfter(b.created)
@@ -101,7 +97,7 @@ class Groups @Inject()(engineConnection: WorkflowEngineConnection, cache: CacheA
           } yield {
             if (result.wasSuccessful) {
               val group = result.data match {
-                case Some(data) => JSONConverter.fromJsonData("Group", (data \ "add")(0).as[JsValue]).asInstanceOf[core.Group]
+                case Some(data) => (data \ "add")(0).as[core.Group]
                 case None => throw new RuntimeException(s"Invalid response received from service.")
               }
 
@@ -169,7 +165,7 @@ class Groups @Inject()(engineConnection: WorkflowEngineConnection, cache: CacheA
           } yield {
             if (result.wasSuccessful) {
               val group = result.data match {
-                case Some(data) => JSONConverter.fromJsonData("Group", (data \ "update")(0).as[JsValue]).asInstanceOf[core.Group]
+                case Some(data) => (data \ "update")(0).as[core.Group]
                 case None => throw new RuntimeException(s"Invalid response received from service.")
               }
 

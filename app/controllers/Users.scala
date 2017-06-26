@@ -21,9 +21,8 @@ import javax.inject.Inject
 import containers.UserData
 import core3.config.StaticConfig
 import core3.database.{ObjectID, RevisionID, RevisionSequenceNumber}
-import core3.database.containers.JSONConverter
 import core3.database.containers.core
-import core3.database.containers.core.UserType
+import core3.database.containers.core.LocalUser.UserType
 import core3.database.dals.DatabaseAbstractionLayer
 import core3.http.controllers.local.ClientController
 import core3.http.requests.WorkflowEngineConnection
@@ -35,17 +34,17 @@ import play.api.cache.CacheApi
 import play.api.data.Forms._
 import play.api.data._
 import play.api.data.format.Formatter
-import play.api.libs.json.{JsArray, JsValue, Json}
+import play.api.libs.json.Json
 import play.filters.csrf.CSRF
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class Users @Inject()(engineConnection: WorkflowEngineConnection, cache: CacheApi, db: DatabaseAbstractionLayer, workflows: Seq[WorkflowBase])
+class Users @Inject()(engineConnection: WorkflowEngineConnection, cache: CacheApi, db: DatabaseAbstractionLayer, workflows: Vector[WorkflowBase])
   (implicit ec: ExecutionContext, environment: Environment)
   extends ClientController(cache, StaticConfig.get.getConfig("security.authentication.clients.LocalUIExample"), db) {
   private val authConfig = StaticConfig.get.getConfig("security.authentication.clients.LocalUIExample")
   private val random = new SecureRandom()
-  private val permissions = workflows.map(_.name) ++ Seq("c3eu:view", "c3eu:edit", "c3eu:delete", "exec:asUser", "exec:asClient")
+  private val permissions = workflows.map(_.name) ++ Vector("c3eu:view", "c3eu:edit", "c3eu:delete", "exec:asUser", "exec:asClient")
 
   def page() = AuthorizedAction(
     "c3eu:view",
@@ -66,10 +65,7 @@ class Users @Inject()(engineConnection: WorkflowEngineConnection, cache: CacheAp
         if (result.wasSuccessful) {
           val users = result.data.map {
             output =>
-              (output \ "users").as[JsArray].value.map {
-                current =>
-                  JSONConverter.fromJsonData("LocalUser", current).asInstanceOf[core.LocalUser]
-              }
+              (output \ "users").as[Vector[core.LocalUser]]
           }.getOrElse(Seq.empty).sortWith(
             (a, b) =>
               a.created.isAfter(b.created)
@@ -98,7 +94,7 @@ class Users @Inject()(engineConnection: WorkflowEngineConnection, cache: CacheAp
             params.userID,
             hashedPassword,
             salt,
-            params.permissions,
+            params.permissions.toVector,
             params.userType,
             Json.obj(
               "first_name" -> params.firstName,
@@ -118,7 +114,7 @@ class Users @Inject()(engineConnection: WorkflowEngineConnection, cache: CacheAp
           } yield {
             if (result.wasSuccessful) {
               val newUser = result.data match {
-                case Some(data) => JSONConverter.fromJsonData("LocalUser", (data \ "add") (0).as[JsValue]).asInstanceOf[core.LocalUser]
+                case Some(data) => (data \ "add")(0).as[core.LocalUser]
                 case None => throw new RuntimeException(s"Invalid response received from service.")
               }
 
@@ -195,7 +191,7 @@ class Users @Inject()(engineConnection: WorkflowEngineConnection, cache: CacheAp
           } yield {
             if (result.wasSuccessful) {
               val updatedUser = result.data match {
-                case Some(data) => JSONConverter.fromJsonData("LocalUser", (data \ "update") (0).as[JsValue]).asInstanceOf[core.LocalUser]
+                case Some(data) => (data \ "update")(0).as[core.LocalUser]
                 case None => throw new RuntimeException(s"Invalid response received from service.")
               }
 
@@ -241,7 +237,7 @@ class Users @Inject()(engineConnection: WorkflowEngineConnection, cache: CacheAp
           } yield {
             if (result.wasSuccessful) {
               val updatedUser = result.data match {
-                case Some(data) => JSONConverter.fromJsonData("LocalUser", (data \ "update")(0).as[JsValue]).asInstanceOf[core.LocalUser]
+                case Some(data) => (data \ "update")(0).as[core.LocalUser]
                 case None => throw new RuntimeException(s"Invalid response received from service.")
               }
 
@@ -296,7 +292,7 @@ class Users @Inject()(engineConnection: WorkflowEngineConnection, cache: CacheAp
           } yield {
             if (result.wasSuccessful) {
               val updatedUser = result.data match {
-                case Some(data) => JSONConverter.fromJsonData("LocalUser", (data \ "update") (0).as[JsValue]).asInstanceOf[core.LocalUser]
+                case Some(data) => (data \ "update")(0).as[core.LocalUser]
                 case None => throw new RuntimeException(s"Invalid response received from service.")
               }
 
@@ -388,7 +384,7 @@ object Users {
         "userUUID" -> uuid,
         "revision" -> uuid,
         "revisionNumber" -> number,
-        "permissions" -> seq(nonEmptyText)
+        "permissions" -> seq(nonEmptyText).transform[Vector[String]](s => s.toVector, v => v)
       )(SystemUpdateLocalUserPermissions.SystemUpdateLocalUserPermissionsParameters.apply)(SystemUpdateLocalUserPermissions.SystemUpdateLocalUserPermissionsParameters.unapply)
     )
 

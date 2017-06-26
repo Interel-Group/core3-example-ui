@@ -19,7 +19,6 @@ import javax.inject.Inject
 
 import containers.UserData
 import core3.config.StaticConfig
-import core3.database.containers.JSONConverter
 import core3.database.containers.core
 import core3.database.dals.DatabaseAbstractionLayer
 import core3.http.controllers.local.ClientController
@@ -28,7 +27,6 @@ import core3.workflows.{NoWorkflowParameters, WorkflowRequest}
 import core3.workflows.definitions._
 import play.api.Environment
 import play.api.cache.CacheApi
-import play.api.libs.json.JsArray
 
 import scala.concurrent.ExecutionContext
 
@@ -53,10 +51,7 @@ class Logs @Inject()(engineConnection: WorkflowEngineConnection, cache: CacheApi
         if (result.wasSuccessful) {
           val logs = result.data.map {
             output =>
-              (output \ "logs").as[JsArray].value.map {
-                current =>
-                  JSONConverter.fromJsonData("TransactionLog", current).asInstanceOf[core.TransactionLog]
-              }
+              (output \ "logs").as[Vector[core.TransactionLog]]
           }.getOrElse(Seq.empty).sortWith(
             (a, b) =>
               a.timestamp.isAfter(b.timestamp)

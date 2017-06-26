@@ -20,7 +20,7 @@ import com.google.inject.{AbstractModule, Provides, Singleton}
 import core3.config.StaticConfig
 import core3.core.{ComponentManager, ComponentManagerActor}
 import core3.database.ContainerType
-import core3.database.containers.{JSONContainerCompanion, JSONConverter, core}
+import core3.database.containers.{BasicContainerDefinition, JsonContainerDefinition, core}
 import core3.http.filters.{CompressionFilter, MaintenanceModeFilter, MetricsFilter, TraceFilter}
 import core3.http.requests.{WorkflowEngineConnection, local}
 import core3.core.Component.ComponentDescriptor
@@ -29,7 +29,6 @@ import core3.database.dals.{Core, DatabaseAbstractionLayer}
 import core3.database.dals.json.Redis
 import core3.workflows.{WorkflowBase, definitions}
 import net.codingwell.scalaguice.ScalaModule
-import play.api.{Environment, Mode}
 import play.api.libs.ws.WSClient
 
 import scala.concurrent.ExecutionContext
@@ -63,18 +62,21 @@ class Module extends AbstractModule with ScalaModule {
 
   @Provides
   @Singleton
-  def provideEngineConnection(ws: WSClient, system: ActorSystem, environment: Environment)(implicit ec: ExecutionContext): WorkflowEngineConnection = {
-    val storeCompanions = Map[ContainerType, JSONContainerCompanion](
-      "Group" -> core.Group,
-      "TransactionLog" -> core.TransactionLog,
-      "LocalUser" -> core.LocalUser
+  def provideContainerDefinitions(): Map[ContainerType, BasicContainerDefinition with JsonContainerDefinition] = {
+    val groupDefinitions = new core.Group.BasicDefinition with core.Group.JsonDefinition
+    val transactionLogDefinitions = new core.TransactionLog.BasicDefinition with core.TransactionLog.JsonDefinition
+    val localUserDefinitions = new core.LocalUser.BasicDefinition with core.LocalUser.JsonDefinition
+
+    Map(
+      "Group" -> groupDefinitions,
+      "TransactionLog" -> transactionLogDefinitions,
+      "LocalUser" -> localUserDefinitions
     )
+  }
 
-    environment.mode match {
-      case Mode.Dev => if (!JSONConverter.isInitialized) JSONConverter.initialize(storeCompanions)
-      case _ => JSONConverter.initialize(storeCompanions)
-    }
-
+  @Provides
+  @Singleton
+  def provideEngineConnection(ws: WSClient, system: ActorSystem)(implicit ec: ExecutionContext): WorkflowEngineConnection = {
     val engineConfig = StaticConfig.get.getConfig("engine")
     implicit val timeout = Timeout(engineConfig.getInt("requestTimeout").seconds)
 
@@ -90,15 +92,7 @@ class Module extends AbstractModule with ScalaModule {
 
   @Provides
   @Singleton
-  def provideDB(environment: Environment)(implicit system: ActorSystem, ec: ExecutionContext): DatabaseAbstractionLayer = {
-    val storeCompanions = Map[ContainerType, JSONContainerCompanion](
-      "LocalUser" -> core.LocalUser
-    )
-
-    environment.mode match {
-      case Mode.Dev => if (!JSONConverter.isInitialized) JSONConverter.initialize(storeCompanions)
-      case _ => JSONConverter.initialize(storeCompanions)
-    }
+  def provideDB(definitions: Map[ContainerType, BasicContainerDefinition with JsonContainerDefinition])(implicit system: ActorSystem, ec: ExecutionContext): DatabaseAbstractionLayer = {
 
     val storeConfig = StaticConfig.get.getConfig("database.redis")
     implicit val timeout = Timeout(StaticConfig.get.getInt("database.requestTimeout").seconds)
@@ -109,7 +103,7 @@ class Module extends AbstractModule with ScalaModule {
         storeConfig.getInt("port"),
         storeConfig.getString("secret"),
         storeConfig.getInt("connectionTimeout"),
-        storeCompanions,
+        definitions,
         storeConfig.getInt("databaseID"),
         storeConfig.getInt("scanCount")
       )
@@ -154,7 +148,7 @@ class Module extends AbstractModule with ScalaModule {
             appName,
             appVersion,
             manager.getRef,
-            Seq(
+            Vector(
               ComponentDescriptor("engine-connection", "Engine service connection", local.ServiceConnectionComponent),
               ComponentDescriptor("db", "Local user database", core3.database.dals.Core)
             )
@@ -167,8 +161,8 @@ class Module extends AbstractModule with ScalaModule {
 
   @Provides
   @Singleton
-  def provideWorkflows(): Seq[WorkflowBase] = {
-    Seq(
+  def provideWorkflows(): Vector[WorkflowBase] = {
+    Vector(
       definitions.SystemCreateGroup,
       definitions.SystemCreateLocalUser,
       definitions.SystemDeleteGroup,
