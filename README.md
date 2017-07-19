@@ -1,6 +1,6 @@
 # core3 - Example User Interface
 
-Example Scala Play 2.5 app showcasing a way to build a frontend service with [core3](https://github.com/Interel-Group/core3).
+Example Scala Play 2.6 app showcasing a way to build a frontend service with [core3](https://github.com/Interel-Group/core3).
 
 ## Getting Started
 * Get and run [core3-example-engine](https://github.com/Interel-Group/core3-example-engine)
@@ -13,7 +13,7 @@ Example Scala Play 2.5 app showcasing a way to build a frontend service with [co
 
 ## Deployment
 
-[Deploying a Play 2.5 application](https://www.playframework.com/documentation/2.5.x/Production)
+[Deploying a Play 2.6 application](https://www.playframework.com/documentation/2.6.x/Production)
 
 ## Interesting files
 * [app/controllers/System](app/controllers/System.scala) - Example actions for handling login, logout, public and authorized pages.
@@ -25,8 +25,8 @@ Example Scala Play 2.5 app showcasing a way to build a frontend service with [co
 * [app/ConsoleStart](app/ConsoleStart.scala) - enables the system management console
 
 ## Built With
-* Scala 2.111
-* sbt 0.13.13
+* Scala 2.12.2
+* sbt 0.13.15
 * [core3](https://github.com/Interel-Group/core3) - Core framework
 * [rediscala](https://github.com/etaty/rediscala) - Redis data layer support
 * [jQuery](https://jquery.com/)
