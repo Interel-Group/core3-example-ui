@@ -26,11 +26,11 @@ import core3.http.requests.WorkflowEngineConnection
 import core3.workflows.{NoWorkflowParameters, WorkflowRequest}
 import core3.workflows.definitions._
 import play.api.Environment
-import play.api.cache.CacheApi
+import play.api.cache.SyncCacheApi
 
 import scala.concurrent.ExecutionContext
 
-class Logs @Inject()(engineConnection: WorkflowEngineConnection, cache: CacheApi, db: DatabaseAbstractionLayer)
+class Logs @Inject()(engineConnection: WorkflowEngineConnection, cache: SyncCacheApi, db: DatabaseAbstractionLayer)
   (implicit ec: ExecutionContext, environment: Environment)
   extends ClientController(cache, StaticConfig.get.getConfig("security.authentication.clients.LocalUIExample"), db) {
 

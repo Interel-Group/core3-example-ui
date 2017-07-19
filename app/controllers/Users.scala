@@ -30,7 +30,7 @@ import core3.http.responses.GenericResult
 import core3.workflows.{NoWorkflowParameters, WorkflowBase, WorkflowRequest}
 import core3.workflows.definitions._
 import play.api.Environment
-import play.api.cache.CacheApi
+import play.api.cache.SyncCacheApi
 import play.api.data.Forms._
 import play.api.data._
 import play.api.data.format.Formatter
@@ -39,7 +39,7 @@ import play.filters.csrf.CSRF
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class Users @Inject()(engineConnection: WorkflowEngineConnection, cache: CacheApi, db: DatabaseAbstractionLayer, workflows: Vector[WorkflowBase])
+class Users @Inject()(engineConnection: WorkflowEngineConnection, cache: SyncCacheApi, db: DatabaseAbstractionLayer, workflows: Vector[WorkflowBase])
   (implicit ec: ExecutionContext, environment: Environment)
   extends ClientController(cache, StaticConfig.get.getConfig("security.authentication.clients.LocalUIExample"), db) {
   private val authConfig = StaticConfig.get.getConfig("security.authentication.clients.LocalUIExample")

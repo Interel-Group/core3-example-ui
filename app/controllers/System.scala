@@ -24,13 +24,13 @@ import core3.http.controllers.local.ClientController
 import core3.http.requests.WorkflowEngineConnection
 import core3.http.responses.GenericResult
 import play.api.Environment
-import play.api.cache.CacheApi
+import play.api.cache.SyncCacheApi
 import play.api.libs.json.Json
 import play.filters.csrf.CSRF
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class System @Inject()(engineConnection: WorkflowEngineConnection, cache: CacheApi, db: DatabaseAbstractionLayer)
+class System @Inject()(engineConnection: WorkflowEngineConnection, cache: SyncCacheApi, db: DatabaseAbstractionLayer)
   (implicit ec: ExecutionContext, environment: Environment)
   extends ClientController(cache, StaticConfig.get.getConfig("security.authentication.clients.LocalUIExample"), db) {
 
