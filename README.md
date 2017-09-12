@@ -25,8 +25,8 @@ Example Scala Play 2.6 app showcasing a way to build a frontend service with [co
 * [app/ConsoleStart](app/ConsoleStart.scala) - enables the system management console
 
 ## Built With
-* Scala 2.12.2
-* sbt 0.13.15
+* Scala 2.12.3
+* sbt 0.13.16
 * [core3](https://github.com/Interel-Group/core3) - Core framework
 * [rediscala](https://github.com/etaty/rediscala) - Redis data layer support
 * [jQuery](https://jquery.com/)

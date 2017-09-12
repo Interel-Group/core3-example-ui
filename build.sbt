@@ -8,7 +8,7 @@ lazy val appName = "core3-example-ui"
 organization := appVendor
 name := appName
 
-scalaVersion in ThisBuild := "2.12.2"
+scalaVersion in ThisBuild := "2.12.3"
 
 lazy val defaultResolvers = Seq(
   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/releases",
@@ -25,7 +25,7 @@ lazy val core3_example_ui = (project in file("."))
       "org.jline" % "jline" % "3.2.0",
       "com.github.scopt" %% "scopt" % "3.5.0",
       "com.github.etaty" %% "rediscala" % "1.8.0",
-      "com.interelgroup" %% "core3" % "2.1.0",
+      "com.interelgroup" %% "core3" % "2.2.0",
       "org.webjars" % "jquery" % "3.0.0"
     ),
     buildInfoKeys := Seq[BuildInfoKey](organization, name, version),
